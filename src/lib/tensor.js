@@ -28,7 +28,8 @@ export class Tensor {
       // Copy the data.
       this.data = data.slice();
     } else {
-      this.data = new Array(size).fill(0);
+      // cast float64 to float32
+      this.data = new Float32Array(size).fill(0);
     }
     // Copy the shape.
     this.shape = shape.slice();
