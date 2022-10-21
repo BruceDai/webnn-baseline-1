@@ -1,5 +1,11 @@
 'use strict';
 
+let TargetTypedArray = Float64Array; // default Float64Array
+
+export function setTargetTypedArray(typedArray) {
+  TargetTypedArray = typedArray;
+}
+
 /**
  * Compute the number of elements given a shape.
  * @param {Array} shape
@@ -28,8 +34,7 @@ export class Tensor {
       // Copy the data.
       this.data = data.slice();
     } else {
-      // cast float64 to float32
-      this.data = new Float32Array(size).fill(0);
+      this.data = new TargetTypedArray(size).fill(0);
     }
     // Copy the shape.
     this.shape = shape.slice();

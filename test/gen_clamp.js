@@ -1,13 +1,12 @@
 'use strict';
 
 import {clamp} from '../src/clamp.js';
-import {Tensor} from '../src/lib/tensor.js';
+import {setTargetTypedArray, Tensor} from '../src/lib/tensor.js';
 // import * as utils from './utils.js';
 
 
 function getBaselineFloat32(inputShape, inputValue, options = {}) {
-  // cast float64 inputs to float32 inputs
-  const inputTensor = new Tensor(inputShape, new Float32Array(inputValue));
+  const inputTensor = new Tensor(inputShape, inputValue);
   const outputTensor = clamp(inputTensor, options);
   return outputTensor.data;
 }
@@ -62,6 +61,12 @@ const tests = {
 
 // Step2: feeding above generated float64 input data to clamp function
 (() => {
+  // Invoke setTargetTypedArray(Float32Array) to set target precision as float32
+  // setTargetTypedArray(Float32Array);
+
+  // Explicitly Invoke setTargetTypedArray(Float64Array) to set target precision as float64
+  setTargetTypedArray(Float64Array);
+
   for (const purpose in tests) {
     if (tests[purpose] !== undefined) {
       const subTests = tests[purpose];
