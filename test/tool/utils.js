@@ -39,6 +39,7 @@ function getPrecisionData(input, precisionType) {
   return data;
 }
 
+
 /**
  * Get converted data from given data dict with specified field and precision type.
  * @param {Object} srcDataDict
@@ -57,7 +58,16 @@ function getPrecisionDataFromDataDict(srcDataDict, source, precisionType) {
  * @param {Number} max
  * @return {Number}
  */
-function getRandomFloat64(min, max) {
+function getRandomFloat64(min, max, sign) {
+  if (sign === 'positive') {
+    if (min < 0) {
+      min = 0;
+    }
+  } else if (sign === 'negative') {
+    if (max > 0) {
+      max = 0;
+    }
+  }
   return Math.random() * (max - min) + min;
 }
 
@@ -69,10 +79,10 @@ function getRandomFloat64(min, max) {
  * @param {String} [type='float64']
  * @return {Array<Number>}
  */
-function getRandomNumbers(min, max, size, type = 'float64') {
+function getRandomNumbers(min, max, size, sign='mixed', type = 'float64') {
   const data = new Array(size);
   for (let i = 0; i < size; i++) {
-    data[i] = getRandomFunctions[type](min, max);
+    data[i] = getRandomFunctions[type](min, max, sign);
   }
   return data;
 }
@@ -107,8 +117,9 @@ function prepareInputsData(inputsDataInfo, dataFile, min, max) {
         dstDataDict['inputsData'][source] = outputTensor.data;
       } else {
         const total = sizeOfShape(targetDataInfo.shape);
+        const sign = targetDataInfo.sign;
         const type = targetDataInfo.type;
-        const generatedNumbers = utils.getRandomNumbers(min, max, total, type);
+        const generatedNumbers = utils.getRandomNumbers(min, max, total, sign, type);
         dstDataDict['inputsData'][source] = generatedNumbers;
       }
     }

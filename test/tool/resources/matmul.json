@@ -1,7 +1,7 @@
 {
   "tests": [
     {
-      "name": "matmul 1D and 1D inputs",
+      "name": "matmul 1D and 1D inputs all positive",
       "inputs": {
         "a": {
           "shape": [4],
@@ -14,6 +14,57 @@
       },
       "expected": {
         "data": "float32DataScalar"
+      },
+      "type": "float32"
+    },
+    {
+      "name": "matmul 1D and 1D inputs all negative",
+      "inputs": {
+        "a": {
+          "shape": [4],
+          "data": "float64DataA1DNegative"
+        },
+        "b": {
+          "shape": [4],
+          "data": "float64DataB1DNegative"
+        }
+      },
+      "expected": {
+        "data": "float32DataScalarNegative"
+      },
+      "type": "float32"
+    },
+    {
+      "name": "matmul positive 1D and negative 1D inputs ",
+      "inputs": {
+        "a": {
+          "shape": [4],
+          "data": "float64DataA1D"
+        },
+        "b": {
+          "shape": [4],
+          "data": "float64DataB1DNegative"
+        }
+      },
+      "expected": {
+        "data": "float32DataScalarPositiveNegative"
+      },
+      "type": "float32"
+    },
+    {
+      "name": "matmul negative 1D and positive 1D inputs ",
+      "inputs": {
+        "a": {
+          "shape": [4],
+          "data": "float64DataA1DNegative"
+        },
+        "b": {
+          "shape": [4],
+          "data": "float64DataB1D"
+        }
+      },
+      "expected": {
+        "data": "float32DataScalarNegativePositive"
       },
       "type": "float32"
     },
@@ -237,41 +288,60 @@
   "inputsData": {
     "float64DataA1D": {
       "shape": [4],
-      "type": "float64" 
+      "type": "float64",
+      "sign": "positive"
     },
     "float64DataB1D": {
       "shape": [4],
-      "type": "float64" 
+      "type": "float64",
+      "sign": "positive"
+    },
+    "float64DataA1DNegative": {
+      "shape": [4],
+      "type": "float64",
+      "sign": "negative"
+    },
+    "float64DataB1DNegative": {
+      "shape": [4],
+      "type": "float64",
+      "sign": "negative"
     },
     "float64DataA2D": {
       "shape": [3, 4],
-      "type": "float64" 
+      "type": "float64",
+      "sign": "positive"
     },
     "float64DataB2D": {
       "shape": [4, 5],
-      "type": "float64" 
+      "type": "float64",
+      "sign": "positive"
     },
     "float64DataB4D": {
       "shape": [2, 2, 4, 2],
-      "type": "float64"
+      "type": "float64",
+      "sign": "positive"
     },
     "float64DataB2DT": {
       "data": "float64DataB2D",
       "transpose": [1, 0],
       "shape": [5, 4],
-      "type": "float64" 
+      "type": "float64",
+      "sign": "positive"
     },
     "float64DataA3D": {
       "shape": [2, 3, 4],
-      "type": "float64" 
+      "type": "float64",
+      "sign": "positive"
     },
     "float64DataB3D": {
       "shape": [2, 4, 5],
-      "type": "float64" 
+      "type": "float64",
+      "sign": "positive"
     },
     "float64DataA4D": {
       "shape": [2, 2, 3, 4],
-      "type": "float64" 
+      "type": "float64",
+      "sign": "positive"
     }
   },
   "expectedData": {
