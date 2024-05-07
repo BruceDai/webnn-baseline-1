@@ -1,0 +1,563 @@
+{
+  "tests": [
+    {
+      "name": "convTranspose2d float32 4D input and filter tensors default options",
+      "inputs": {
+        "input": {
+          "shape": [1, 1, 2, 2],
+          "data": "float64DataInputDefaultOptions",
+          "type": "float32"
+        },
+        "filter": {
+          "shape": [1, 1, 2, 2],
+          "data": "float64DataFilterDefaultOptions",
+          "type": "float32"
+        }
+      },
+      "expected": {
+        "name": "output",
+        "shape": [1, 1, 3, 3],
+        "data": "float32DefaultOptions",
+        "type": "float32"
+      }
+    },
+    {
+      "name": "convTranspose2d float32 4D input and filter tensors options.groups",
+      "inputs": {
+        "input": {
+          "shape": [1, 2, 2, 2],
+          "data": "float64DataInputOptionsGroups",
+          "type": "float32"
+        },
+        "filter": {
+          "shape": [2, 1, 2, 2],
+          "data": "float64DataFilterOptionsGroups",
+          "type": "float32"
+        }
+      },
+      "options": {
+        "groups": 2
+      },
+      "expected": {
+        "name": "output",
+        "shape": [1, 2, 3, 3],
+        "data": "float32OptionsGroups",
+        "type": "float32"
+      }
+    },
+    {
+      "name": "convTranspose2d float32 4D input and filter tensors options.groups=2 options.strides=[2, 2]",
+      "inputs": {
+        "input": {
+          "shape": [1, 2, 2, 2],
+          "data": "float64DataInputOptionsGroups",
+          "type": "float32"
+        },
+        "filter": {
+          "shape": [2, 1, 2, 2],
+          "data": "float64DataFilterOptionsGroups",
+          "type": "float32"
+        }
+      },
+      "options": {
+        "groups": 2,
+        "strides": [2, 2]
+      },
+      "expected": {
+        "name": "output",
+        "shape": [1, 2, 4, 4],
+        "data": "float32OptionsGroupsStrides",
+        "type": "float32"
+      }
+    },
+    {
+      "name": "convTranspose2d float32 4D input and filter tensors options.padding",
+      "inputs": {
+        "input": {
+          "shape": [1, 1, 2, 2],
+          "data": "float64DataInputDefaultOptions",
+          "type": "float32"
+        },
+        "filter": {
+          "shape": [1, 1, 2, 2],
+          "data": "float64DataFilterDefaultOptions",
+          "type": "float32"
+        }
+      },
+      "options": {
+        "padding": [1, 1, 1, 1]
+      },
+      "expected": {
+        "name": "output",
+        "shape": [1, 1, 1, 1],
+        "data": "float32OptionsPadding",
+        "type": "float32"
+      }
+    },
+    {
+      "name": "convTranspose2d float32 4D input and filter tensors options.strides",
+      "inputs": {
+        "input": {
+          "shape": [1, 1, 3, 3],
+          "data": "float64DataInputOptionsStrides",
+          "type": "float32"
+        },
+        "filter": {
+          "shape": [1, 2, 3, 3],
+          "data": "float64DataFilterOptionsStrides",
+          "type": "float32"
+        }
+      },
+      "options": {
+        "strides": [3, 2]
+      },
+      "expected": {
+        "name": "output",
+        "shape": [1, 2, 9, 7],
+        "data": "float32OptionsStrides",
+        "type": "float32"
+      }
+    },
+    {
+      "name": "convTranspose2d float32 4D input and filter tensors options.dilations",
+      "inputs": {
+        "input": {
+          "shape": [1, 1, 3, 3],
+          "data": "float64DataInputOptionsDilations",
+          "type": "float32"
+        },
+        "filter": {
+          "shape": [1, 1, 2, 2],
+          "data": "float64DataFilterOptionsDilations",
+          "type": "float32"
+        }
+      },
+      "options": {
+        "dilations": [2, 2]
+      },
+      "expected": {
+        "name": "output",
+        "shape": [1, 1, 5, 5],
+        "data": "float32OptionsDilations",
+        "type": "float32"
+      }
+    },
+    {
+      "name": "convTranspose2d float32 4D input and filter tensors options.outputPadding",
+      "inputs": {
+        "input": {
+          "shape": [1, 1, 3, 3],
+          "data": "float64DataInputOptionsStrides",
+          "type": "float32"
+        },
+        "filter": {
+          "shape": [1, 2, 3, 3],
+          "data": "float64DataFilterOptionsStrides",
+          "type": "float32"
+        }
+      },
+      "options": {
+        "strides": [3, 2],
+        "outputPadding": [1, 1]
+      },
+      "expected": {
+        "name": "output",
+        "shape": [1, 2, 10, 8],
+        "data": "float32OptionsOutputPadding",
+        "type": "float32"
+      }
+    },
+    {
+      "name": "convTranspose2d float32 4D input and filter tensors options.outputSizes",
+      "inputs": {
+        "input": {
+          "shape": [1, 1, 3, 3],
+          "data": "float64DataInputOptionsStrides",
+          "type": "float32"
+        },
+        "filter": {
+          "shape": [1, 2, 3, 3],
+          "data": "float64DataFilterOptionsStrides",
+          "type": "float32"
+        }
+      },
+      "options": {
+        "strides": [3, 2],
+        "outputSizes": [10, 8]
+      },
+      "expected": {
+        "name": "output",
+        "shape": [1, 2, 10, 8],
+        "data": "float32OptionsOutputPadding",
+        "type": "float32"
+      }
+    },
+    {
+      "name": "convTranspose2d float32 4D input and filter tensors options.inputLayout=nchw",
+      "inputs": {
+        "input": {
+          "shape": [1, 1, 3, 3],
+          "data": "float64DataInputOptionsStrides",
+          "type": "float32"
+        },
+        "filter": {
+          "shape": [1, 2, 3, 3],
+          "data": "float64DataFilterOptionsStrides",
+          "type": "float32"
+        }
+      },
+      "options": {
+        "inputLayout": "nchw"
+      },
+      "expected": {
+        "name": "output",
+        "shape": [1, 2, 5, 5],
+        "data": "float32OptionsInputLayoutNchw",
+        "type": "float32"
+      }
+    },
+    {
+      "name": "convTranspose2d float32 4D input and filter tensors options.inputLayout=nhwc",
+      "inputs": {
+        "input": {
+          "shape": [1, 3, 3, 1],
+          "data": "float64DataInputOptionsStridesNhwcT",
+          "type": "float32"
+        },
+        "filter": {
+          "shape": [1, 2, 3, 3],
+          "data": "float64DataFilterOptionsStrides",
+          "type": "float32"
+        }
+      },
+      "options": {
+        "inputLayout": "nhwc"
+      },
+      "expected": {
+        "name": "output",
+        "shape": [1, 5, 5, 2],
+        "data": "float32OptionsInputLayoutNhwc",
+        "type": "float32"
+      }
+    },
+    {
+      "name": "convTranspose2d float32 4D input and filter tensors options.filterLayout=iohw",
+      "inputs": {
+        "input": {
+          "shape": [1, 1, 3, 3],
+          "data": "float64DataInputOptionsStrides",
+          "type": "float32"
+        },
+        "filter": {
+          "shape": [1, 2, 3, 3],
+          "data": "float64DataFilterOptionsStrides",
+          "type": "float32"
+        }
+      },
+      "options": {
+        "filterLayout": "iohw"
+      },
+      "expected": {
+        "name": "output",
+        "shape": [1, 2, 5, 5],
+        "data": "float32OptionsInputLayoutNchw",
+        "type": "float32"
+      }
+    },
+    {
+      "name": "convTranspose2d float32 4D input and filter tensors options.filterLayout=hwoi",
+      "inputs": {
+        "input": {
+          "shape": [1, 1, 3, 3],
+          "data": "float64DataInputOptionsStrides",
+          "type": "float32"
+        },
+        "filter": {
+          "shape": [3, 3, 2, 1],
+          "data": "float64DataFilterOptionsStridesHwoiT",
+          "type": "float32"
+        }
+      },
+      "options": {
+        "filterLayout": "hwoi"
+      },
+      "expected": {
+        "name": "output",
+        "shape": [1, 2, 5, 5],
+        "data": "float32OptionsInputLayoutNchw",
+        "type": "float32"
+      }
+    },
+    {
+      "name": "convTranspose2d float32 4D input and filter tensors options.filterLayout=ohwi",
+      "inputs": {
+        "input": {
+          "shape": [1, 1, 3, 3],
+          "data": "float64DataInputOptionsStrides",
+          "type": "float32"
+        },
+        "filter": {
+          "shape": [2, 3, 3, 1],
+          "data": "float64DataFilterOptionsStridesOhwiT",
+          "type": "float32"
+        }
+      },
+      "options": {
+        "filterLayout": "ohwi"
+      },
+      "expected": {
+        "name": "output",
+        "shape": [1, 2, 5, 5],
+        "data": "float32OptionsInputLayoutNchw",
+        "type": "float32"
+      }
+    },
+    {
+      "name": "convTranspose2d float32 4D input and filter tensors options.inputLayout=nhwc options.filterLayout=iohw",
+      "inputs": {
+        "input": {
+          "shape": [1, 3, 3, 1],
+          "data": "float64DataInputOptionsStridesNhwcT",
+          "type": "float32"
+        },
+        "filter": {
+          "shape": [1, 2, 3, 3],
+          "data": "float64DataFilterOptionsStrides",
+          "type": "float32"
+        }
+      },
+      "options": {
+	    "inputLayout": "nhwc",
+        "filterLayout": "iohw"
+      },
+      "expected": {
+        "name": "output",
+        "shape": [1, 5, 5, 2],
+        "data": "float32OptionsInputLayoutNhwc",
+        "type": "float32"
+      }
+    },
+    {
+      "name": "convTranspose2d float32 4D input and filter tensors options.inputLayout=nhwc options.filterLayout=hwoi",
+      "inputs": {
+        "input": {
+          "shape": [1, 3, 3, 1],
+          "data": "float64DataInputOptionsStridesNhwcT",
+          "type": "float32"
+        },
+        "filter": {
+          "shape": [3, 3, 2, 1],
+          "data": "float64DataFilterOptionsStridesHwoiT",
+          "type": "float32"
+        }
+      },
+      "options": {
+        "inputLayout": "nhwc",
+        "filterLayout": "hwoi"
+      },
+      "expected": {
+        "name": "output",
+        "shape": [1, 5, 5, 2],
+        "data": "float32OptionsInputLayoutNhwc",
+        "type": "float32"
+      }
+    },
+    {
+      "name": "convTranspose2d float32 4D input and filter tensors options.inputLayout=nhwc options.filterLayout=ohwi",
+      "inputs": {
+        "input": {
+          "shape": [1, 3, 3, 1],
+          "data": "float64DataInputOptionsStridesNhwcT",
+          "type": "float32"
+        },
+        "filter": {
+          "shape": [2, 3, 3, 1],
+          "data": "float64DataFilterOptionsStridesOhwiT",
+          "type": "float32"
+        }
+      },
+      "options": {
+	      "inputLayout": "nhwc",
+        "filterLayout": "ohwi"
+      },
+      "expected": {
+        "name": "output",
+        "shape": [1, 5, 5, 2],
+        "data": "float32OptionsInputLayoutNhwc",
+        "type": "float32"
+      }
+    },
+    {
+      "name": "convTranspose2d float32 4D input and filter tensors options.bias",
+      "inputs": {
+        "input": {
+          "shape": [1, 1, 3, 3],
+          "data": "float64DataInputOptionsBias",
+          "type": "float32"
+        },
+        "filter": {
+          "shape": [1, 1, 3, 3],
+          "data": "float64DataFilterOptionsBias",
+          "type": "float32"
+        }
+      },
+      "options": {
+        "bias": {
+          "shape": [1],
+          "data": "float64DataBias",
+          "type": "float32"
+        }
+      },
+      "expected": {
+        "name": "output",
+        "shape": [1, 1, 5, 5],
+        "data": "float32OptionsBias",
+        "type": "float32"
+      }
+    },
+    {
+      "name": "convTranspose2d float32 4D input and filter tensors, both negative input tensor and options.bias",
+      "inputs": {
+        "input": {
+          "shape": [1, 1, 3, 3],
+          "data": "float64DataNegativeInputOptionsBias",
+          "type": "float32"
+        },
+        "filter": {
+          "shape": [1, 1, 3, 3],
+          "data": "float64DataFilterOptionsBias",
+          "type": "float32"
+        }
+      },
+      "options": {
+        "bias": {
+          "shape": [1],
+          "data": "float64DataNegativeBias",
+          "type": "float32"
+        }
+      },
+      "expected": {
+        "name": "output",
+        "shape": [1, 1, 5, 5],
+        "data": "float32NegativeOptionsBias",
+        "type": "float32"
+      }
+    },
+    {
+      "name": "convTranspose2d float32 4D input and filter tensors options.activation=relu",
+      "inputs": {
+        "input": {
+          "shape": [1, 1, 3, 3],
+          "data": "float64DataInputOptionsBias",
+          "type": "float32"
+        },
+        "filter": {
+          "shape": [1, 1, 3, 3],
+          "data": "float64DataFilterOptionsBias",
+          "type": "float32"
+        }
+      },
+      "options": {
+        "activation": "relu" // relu operator
+      },
+      "expected": {
+        "name": "output",
+        "shape": [1, 1, 5, 5],
+        "data": "float32OptionsActivation",
+        "type": "float32"
+      }
+    }
+  ],
+  "inputsData": {
+    "float64DataInputDefaultOptions": {
+      "shape": [1, 1, 2, 2],
+      "type": "float64",
+      "sign": "positive"
+    },
+    "float64DataFilterDefaultOptions": {
+      "shape": [1, 1, 2, 2],
+      "type": "float64",
+      "sign": "positive"
+    },
+    "float64DataInputOptionsStrides": {
+      "shape": [1, 1, 3, 3],
+      "type": "float64",
+      "sign": "positive"
+    },
+    "float64DataFilterOptionsStrides": {
+      "shape": [1, 2, 3, 3],
+      "type": "float64",
+      "sign": "positive"
+    },
+    "float64DataInputOptionsDilations": {
+      "shape": [1, 1, 3, 3],
+      "type": "float64",
+      "sign": "positive"
+    },
+    "float64DataFilterOptionsDilations": {
+      "shape": [1, 1, 2, 2],
+      "type": "float64",
+      "sign": "positive"
+    },
+    "float64DataInputOptionsStridesNhwcT": { // transpose float64DataInputOptionsStrides by nhwc [0, 2, 3, 1]
+      "data": "float64DataInputOptionsStrides",
+      "transpose": [0, 2, 3, 1],
+      "shape": [1, 3, 3, 1],
+      "type": "float64",
+      "sign": "positive"
+    },
+    "float64DataFilterOptionsStridesHwoiT": { // transpose float64DataFilterOptionsStrides by hwoi [2, 3, 1, 0]
+      "data": "float64DataFilterOptionsStrides",
+      "transpose": [2, 3, 1, 0],
+      "shape": [3, 3, 2, 1],
+      "type": "float64",
+      "sign": "positive"
+    },
+    "float64DataFilterOptionsStridesOhwiT": { // transpose float64DataFilterOptionsStrides by ohwi [1, 2, 3, 0]
+      "data": "float64DataFilterOptionsStrides",
+      "transpose": [1, 2, 3, 0],
+      "shape": [2, 3, 3, 1],
+      "type": "float64",
+      "sign": "positive"
+    },
+    "float64DataInputOptionsBias": {
+      "shape": [1, 1, 3, 3],
+      "type": "float64",
+      "sign": "positive"
+    },
+    "float64DataNegativeInputOptionsBias": {
+      "shape": [1, 1, 3, 3],
+      "type": "float64",
+      "sign": "negative"
+    },
+    "float64DataFilterOptionsBias": {
+      "shape": [1, 1, 3, 3],
+      "type": "float64",
+      "sign": "positive"
+    },
+    "float64DataBias": {
+      "shape": [1],
+      "type": "float64",
+      "sign": "positive"
+    },
+    "float64DataNegativeBias": {
+      "shape": [1],
+      "type": "float64",
+      "sign": "negative"
+    },
+    "float64DataInputOptionsGroups": {
+      "shape": [1, 2, 2, 2],
+      "type": "float64",
+      "sign": "positive"
+    },
+    "float64DataFilterOptionsGroups": {
+      "shape": [2, 1, 2, 2],
+      "type": "float64",
+      "sign": "positive"
+    }
+  },
+  "inputsDataRange": {
+    "max": 1,
+    "min": -1
+  }
+}
