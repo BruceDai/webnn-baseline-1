@@ -1,5 +1,8 @@
 {
   "inputsData": {
+    "float64DataPositive0DScalar": [
+      4.860227954324237
+    ],
     "float64DataAllPositive": [
       4.860227954324237,
       88.23184532015614,
@@ -106,6 +109,9 @@
     ]
   },
   "expectedData": {
+    "float32DataDefault0DScalar": [
+      4.860228061676025
+    ],
     "float32DataDefault": [
       272.0996398925781
     ],

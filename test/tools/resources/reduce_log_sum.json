@@ -1,6 +1,21 @@
 {
   "tests": [
     {
+      "name": "reduceLogSum float32 0D constant tensor all non-negative default options",
+      "inputs": {
+        "input": {
+          "shape": [],
+          "data": "float64DataNoneNegative0DScalar",
+          "type": "float32"
+        }
+      },
+      "expected": {
+        "name": "output",
+        "data": "float32DataDefault0DScalar",
+        "type": "float32"
+      }
+    },
+    {
       "name": "reduceLogSum float32 1D tensor all positive default options",
       "inputs": {
         "input": {
@@ -275,6 +290,11 @@
     }
   ],
   "inputsData": {
+    "float64DataNoneNegative0DScalar": {
+      "shape": [1],
+      "type": "float64",
+      "sign": "positive"
+    },
     "float64DataAllPositive": {
       "shape": [24],
       "type": "float64",

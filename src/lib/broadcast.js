@@ -7,6 +7,7 @@ import {Tensor} from './tensor.js';
  * @return {Tensor}
  */
 export function broadcast(input, newShape) {
+  input = input.rank === 0 ? new Tensor([1], input.data) : input;
   const newRank = newShape.length;
   if (newRank < input.rank) {
     throw new Error(`The rank of new shape ${newRank} is invalid.`);

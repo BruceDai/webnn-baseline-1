@@ -1,5 +1,20 @@
 {
-  "tests": [ 
+  "tests": [
+    {
+      "name": "reduceProduct float32 0D constant tensor default options",
+      "inputs": {
+        "input": {
+          "shape": [],
+          "data": "float64Data0DScalar",
+          "type": "float32"
+        }
+      },
+      "expected": {
+        "name": "output",
+        "data": "float32DataDefault0DScalar",
+        "type": "float32"
+      }
+    },  
     {
       "name": "reduceProduct float32 1D tensor default options",
       "inputs": {
@@ -229,6 +244,10 @@
     }
   ],
   "inputsData": {
+    "float64Data0DScalar": {
+      "shape": [1],
+      "type": "float64"
+    },
     "float64Data": {
       "shape": [24],
       "type": "float64"

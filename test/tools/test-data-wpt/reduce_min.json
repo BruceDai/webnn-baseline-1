@@ -1,6 +1,25 @@
 {
   "tests": [
     {
+      "name": "reduceMin float32 0D constant tensor default options",
+      "inputs": {
+        "input": {
+          "shape": [],
+          "data": [
+            -58.76195671214997
+          ],
+          "type": "float32"
+        }
+      },
+      "expected": {
+        "name": "output",
+        "data": [
+          -58.76195526123047
+        ],
+        "type": "float32"
+      }
+    },
+    {
       "name": "reduceMin float32 1D tensor default options",
       "inputs": {
         "input": {

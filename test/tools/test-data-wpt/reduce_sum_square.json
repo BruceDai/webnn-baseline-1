@@ -1,6 +1,25 @@
 {
   "tests": [
     {
+      "name": "reduceSumSquare float32 0D constant tensor all positive default options",
+      "inputs": {
+        "input": {
+          "shape": [],
+          "data": [
+            52.5615351837915
+          ],
+          "type": "float32"
+        }
+      },
+      "expected": {
+        "name": "output",
+        "data": [
+          2762.71484375
+        ],
+        "type": "float32"
+      }
+    },
+    {
       "name": "reduceSumSquare float32 1D tensor all positive default options",
       "inputs": {
         "input": {
