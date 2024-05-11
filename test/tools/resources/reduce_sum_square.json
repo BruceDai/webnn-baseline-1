@@ -1,0 +1,303 @@
+{
+  "tests": [
+    {
+      "name": "reduceSumSquare float32 1D tensor all positive default options",
+      "inputs": {
+        "input": {
+          "shape": [24],
+          "data": "float64DataAllPositive",
+          "type": "float32"
+        }
+      },
+      "expected": {
+        "name": "output",
+        "data": "float32DataDefault",
+        "type": "float32"
+      }
+    },
+    {
+      "name": "reduceSumSquare float32 1D tensor all negative default options",
+      "inputs": {
+        "input": {
+          "shape": [24],
+          "data": "float64DataAllNegative",
+          "type": "float32"
+        }
+      },
+      "expected": {
+        "name": "output",
+        "data": "float32DatAllNegativeDefault",
+        "type": "float32"
+      }
+    },
+    {
+      "name": "reduceSumSquare float32 1D tensor all positive integers default options", // test with float32 values which are equivalent to integers
+      "inputs": {
+        "input": {
+          "shape": [24],
+          "data": "float64DataAllPositiveIntegers",
+          "type": "float32"
+        }
+      },
+      "expected": {
+        "name": "output",
+        "data": "float32DatAllPositiveIntegersDefault",
+        "type": "float32"
+      }
+    },
+    {
+      "name": "reduceSumSquare float32 1D tensor all negative integers default options", // test with float32 values which are equivalent to integers
+      "inputs": {
+        "input": {
+          "shape": [24],
+          "data": "float64DataAllNegativeIntegers",
+          "type": "float32"
+        }
+      },
+      "expected": {
+        "name": "output",
+        "data": "float32DatAllNegativeIntegersDefault",
+        "type": "float32"
+      }
+    },
+
+    {
+      "name": "reduceSumSquare float32 2D tensor default options",
+      "inputs": {
+        "input": {
+          "shape": [4, 6],
+          "data": "float64DataAllPositive",
+          "type": "float32"
+        }
+      },
+      "expected": {
+        "name": "output",
+        "data": "float32DataDefault",
+        "type": "float32"
+      }
+    },
+    {
+      "name": "reduceSumSquare float32 3D tensor default options",
+      "inputs": {
+        "input": {
+          "shape": [2, 3, 4],
+          "data": "float64DataAllPositive",
+          "type": "float32"
+        }
+      },
+      "expected": {
+        "name": "output",
+        "data": "float32DataDefault",
+        "type": "float32"
+      }
+    },
+    {
+      "name": "reduceSumSquare float32 4D tensor default options",
+      "inputs": {
+        "input": {
+          "shape": [2, 2, 2, 3],
+          "data": "float64DataAllPositive",
+          "type": "float32"
+        }
+      },
+      "expected": {
+        "name": "output",
+        "data": "float32DataDefault",
+        "type": "float32"
+      }
+    },
+    {
+      "name": "reduceSumSquare float32 5D tensor default options",
+      "inputs": {
+        "input": {
+          "shape": [2, 1, 4, 1, 3],
+          "data": "float64DataAllPositive",
+          "type": "float32"
+        }
+      },
+      "expected": {
+        "name": "output",
+        "data": "float32DataDefault",
+        "type": "float32"
+      }
+    },
+    {
+      "name": "reduceSumSquare float32 3D tensor options.axes",
+      "inputs": {
+        "input": {
+          "shape": [2, 3, 4],
+          "data": "float64DataAllPositive",
+          "type": "float32"
+        }
+      },
+      "options": {
+        "axes": [2]
+      },
+      "expected": {
+        "name": "output",
+        "shape": [2, 3],
+        "data": "float32Data3DAxes",
+        "type": "float32"
+      }
+    },
+    {
+      "name": "reduceSumSquare float32 4D tensor options.axes",
+      "inputs": {
+        "input": {
+          "shape": [2, 2, 2, 3],
+          "data": "float64DataAllPositive",
+          "type": "float32"
+        }
+      },
+      "options": {
+        "axes": [0, 2]
+      },
+      "expected": {
+        "name": "output",
+        "shape": [2, 3],
+        "data": "float32Data4DAxes",
+        "type": "float32"
+      }
+    },
+    {
+      "name": "reduceSumSquare float32 3D tensor options.keepDimensions=false",
+      "inputs": {
+        "input": {
+          "shape": [2, 3, 4],
+          "data": "float64DataAllPositive",
+          "type": "float32"
+        }
+      },
+      "options": {
+        "keepDimensions": false
+      },
+      "expected": {
+        "name": "output",
+        "data": "float32DataDefault",
+        "type": "float32"
+      }
+    },
+    {
+      "name": "reduceSumSquare float32 3D tensor options.keepDimensions=true",
+      "inputs": {
+        "input": {
+          "shape": [2, 3, 4],
+          "data": "float64DataAllPositive",
+          "type": "float32"
+        }
+      },
+      "options": {
+        "keepDimensions": true
+      },
+      "expected": {
+        "name": "output",
+        "shape": [1, 1, 1],
+        "data": "float32DataDefault",
+        "type": "float32"
+      }
+    },
+    {
+      "name": "reduceSumSquare float32 4D tensor options.keepDimensions=false",
+      "inputs": {
+        "input": {
+          "shape": [2, 2, 2, 3],
+          "data": "float64DataAllPositive",
+          "type": "float32"
+        }
+      },
+      "options": {
+        "keepDimensions": false
+      },
+      "expected": {
+        "name": "output",
+        "data": "float32DataDefault",
+        "type": "float32"
+      }
+    },
+    {
+      "name": "reduceSumSquare float32 4D tensor options.keepDimensions=true",
+      "inputs": {
+        "input": {
+          "shape": [2, 2, 2, 3],
+          "data": "float64DataAllPositive",
+          "type": "float32"
+        }
+      },
+      "options": {
+        "keepDimensions": true
+      },
+      "expected": {
+        "name": "output",
+        "shape": [1, 1, 1, 1],
+        "data": "float32DataDefault",
+        "type": "float32"
+      }
+    },
+    {
+      "name": "reduceSumSquare float32 4D tensor options.axes with options.keepDimensions=false",
+      "inputs": {
+        "input": {
+          "shape": [2, 2, 2, 3],
+          "data": "float64DataAllPositive",
+          "type": "float32"
+        }
+      },
+      "options": {
+        "axes": [1, 3],
+        "keepDimensions": false
+      },
+      "expected": {
+        "name": "output",
+        "shape": [2, 2],
+        "data": "float32Data4DAxesNotKeepDimensions",
+        "type": "float32"
+      }
+    },
+    {
+      "name": "reduceSumSquare float32 4D tensor options.axes with options.keepDimensions=true",
+      "inputs": {
+        "input": {
+          "shape": [2, 2, 2, 3],
+          "data": "float64DataAllPositive",
+          "type": "float32"
+        }
+      },
+      "options": {
+        "axes": [1, 3],
+        "keepDimensions": true
+      },
+      "expected": {
+        "name": "output",
+        "shape": [2, 1, 2, 1],
+        "data": "float32Data4DAxesKeepDimensions",
+        "type": "float32"
+      }
+    }
+  ],
+  "inputsData": {
+    "float64DataAllPositive": {
+      "shape": [24],
+      "type": "float64",
+      "sign": "positive"
+    },
+    "float64DataAllNegative": {
+      "shape": [24],
+      "type": "float64",
+      "sign": "negative"
+    },
+    "float64DataAllPositiveIntegers": {
+      "shape": [24],
+      "type": "int32",
+      "sign": "positive"
+    },
+    "float64DataAllNegativeIntegers": {
+      "shape": [24],
+      "type": "int32",
+      "sign": "negative"
+    }
+  },
+  "inputsDataRange": {
+    "max": 100,
+    "min": -100
+  }
+}
