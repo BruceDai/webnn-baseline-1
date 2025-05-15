@@ -8,21 +8,94 @@ import {Tensor, sizeOfShape} from '../../src/lib/tensor.js';
 import {neg} from '../../src/unary.js';
 import {transpose} from '../../src/transpose.js';
 
+const currentFolder = path.dirname(process.argv[1]);
 
 /**
- * Convert data as required precision type.
- * @param {Array<Number>} input
- * @param {String} precisionType
- * @return {(Array<Number>|Number)}
+ * Default valid data ranges for each supported data type.
  */
-function getPrecisionData(input, precisionType) {
+const defaultDataRange = {
+  int8: {
+    min: -128,
+    max: 127,
+  },
+  uint8: {
+    min: 0,
+    max: 255,
+  },
+  int32: {
+    min: -Math.pow(2, 31),
+    max: Math.pow(2, 31) - 1,
+  },
+  uint32: {
+    min: 0,
+    max: Math.pow(2, 32) - 1,
+  },
+  int64: {
+    // int64 range: [/* -(2**63) */ –9223372036854775808, /* 2**63 - 1 */ 92233720368547758087]
+    // The maximum safe integer in JavaScript (2**53 - 1)
+    // The minimum safe integer in JavaScript -(2**53 - 1)
+    min: -(Math.pow(2, 53) - 1),
+    max: Math.pow(2, 53) - 1,
+  },
+  uint64: {
+    // uint64 range: [0, /* 2**64 - 1 */ 18446744073709551615]
+    // The maximum safe integer in JavaScript (2**53 - 1)
+    min: 0,
+    max: Math.pow(2, 53) - 1,
+  },
+  float16: {
+    // https://en.wikipedia.org/wiki/Half-precision_floating-point_format
+    min: -65504, // 1 11110 1111111111
+    max: 65504, // 0 11110 1111111111
+  },
+  float32: {
+    // https://en.wikipedia.org/wiki/Single-precision_floating-point_format
+    // largest normal number (0 11111110 11111111111111111111111): 2**127 * [2 − 2**(−23)]
+    // The maximum safe integer in JavaScript (2**53 - 1)
+    // The minimum safe integer in JavaScript -(2**53 - 1)
+    min: -(Math.pow(2, 53) - 1),
+    max: Math.pow(2, 53) - 1,
+  },
+};
+
+/**
+ * Map of supported data types to corresponding TypedArray constructors.
+ */
+const TypedArrayDict = {
+  // https://www.w3.org/TR/webnn/#enumdef-mloperanddatatype
+  float32: Float32Array,
+  float16: Float16Array,
+  int32: Int32Array,
+  uint32: Uint32Array,
+
+  // TODO: support int64 and uint64
+  // current using Int32Array for int64 and Uint32Array for uint64
+  // int64: BigInt64Array,
+  // uint64: BigUint64Array,
+  int64: Int32Array,
+  uint64: Uint32Array,
+
+  int8: Int8Array,
+  uint8: Uint8Array,
+
+  int4: Uint8Array, // Packed into Uint8Array
+  uint4: Uint8Array, // Packed into Uint8Array
+};
+
+/**
+ * Convert an input number or array to a typed array of the given data type.
+ * @param {Array<Number>|Number} input - The number(s) to convert.
+ * @param {String} dataType - The target data type (e.g., 'float32', 'int64').
+ * @return {TypedArray|Number} - Converted data in specified precision.
+ */
+function getPrecisionData(input, dataType) {
   let data;
   const isNumber = typeof input === 'number';
   if (isNumber) {
     input = [input];
   }
 
-  switch (precisionType) {
+  switch (dataType) {
     case 'float16':
       data = new Float16Array(input);
       break;
@@ -42,10 +115,16 @@ function getPrecisionData(input, precisionType) {
       data = new Uint32Array(input);
       break;
     case 'int64':
-      data = new BigInt64Array(input.map((x) => BigInt(x)));
+      // TODO: support int64 and uint64
+      // data = new BigInt64Array(input.map((x) => BigInt(x)));
+
+      data = new Int32Array(input);
       break;
     case 'uint64':
-      data = new BigUint64Array(input.map((x) => BigInt(x)));
+      // TODO: support int64 and uint64
+      // data = new BigUint64Array(input.map((x) => BigInt(x)));
+
+      data = new Uint32Array(input);
       break;
     default:
       break;
@@ -58,175 +137,150 @@ function getPrecisionData(input, precisionType) {
 }
 
 /**
- * Get converted data from given data dict with specified field and precision type.
- * @param {Object} srcDataDict
- * @param {String} source
- * @param {String} precisionType
- * @return {(Array<Number>|Number)}
+ * Validate that a custom min/max range is within the default allowed limits.
+ * @param {Number} min - Minimum value.
+ * @param {Number} max - Maximum value.
+ * @param {String} dataType - Data type to validate against.
  */
-function getPrecisionDataFromDataDict(srcDataDict, source, precisionType) {
-  const feedData = srcDataDict[source];
-  return getPrecisionData(feedData, precisionType);
-}
-
-/**
- * Get a random number by specified dataRange and dataType.
- * @param {{min: Number, max: Number, sign: String}} dataRange
- * @param {String} dataType
- * @return {Number}
- */
-function getRandom(dataRange, dataType) {
-  function getFloatRandomInclusive() {
-    // The Math. random() method returns a random floating point number between 0 (inclusive)
-    // and 1 (exclusive).
-    const value = Math.min(Math.random() * 2, 1);
-    return value;
-  }
-
-  function validateMinMaxByType(min, max, type) {
-    if (type === 'int8' && (min < -128 || max > 127)) {
-      throw new Error(`The range of int8 type should be [-128, 127].`);
-    } else if (type === 'uint8' && (min < 0 || max > 255)) {
-      throw new Error(`The range of uint8 type should be [0, 255].`);
-    } else if (type === 'int32' && (min < -Math.pow(2, 31) || max > Math.pow(2, 31) - 1)) {
-      throw new Error(
-          `The range of int32 type should be [${-Math.pow(2, 31)}, ${Math.pow(2, 31) - 1}].`);
-    } else if (type === 'uint32' && (min < 0 || max > Math.pow(2, 32) - 1)) {
-      throw new Error(`The range of uint32 type should be [0, ${Math.pow(2, 32) - 1}].`);
-    } else if (type === 'float16') {
-      const fp16Max = (2 - Math.pow(2, -10)) * Math.pow(2, 15);
-      if (min < -fp16Max || max > fp16Max) {
-        throw new Error(`The range of float16 type should be [${-fp16Max}, ${fp16Max}].`);
-      }
-    } else if (type === 'int64') {
-      const int64Max = 2n ** 64n - 1n;
-      if (min < -int64Max - 1n || max > int64Max) {
-        throw new Error('The range of int64 type should be ' +
-          `[${-int64Max - 1n}, ${int64Max}].`);
-      }
-    } else if (type === 'uint64') {
-      // In JavaScript, you can represent a BigUint64 using the BigInt data type.
-      const int64Max = 2n ** 64n - 1n;
-      if (min < 0n || max > int64Max) {
-        throw new Error(`The range of uint64 type should be [0n, ${int64Max}].`);
-      }
-    } else if (type === 'float32') {
-      const fp32Max = (2 - Math.pow(2, -23)) * Math.pow(2, 127);
-      if (min < -fp32Max || max > fp32Max) {
-        throw new Error(`The range of float32 type should be [${-fp32Max}, ${fp32Max}].`);
-      }
-    }
-  }
-
-  let min = dataRange.min;
-  let max = dataRange.max;
+function validateMinMax(min, max, dataType) {
   if (min > max) {
     throw new Error(`The min should be lesser than max.`);
   }
 
-  validateMinMaxByType(min, max, dataType);
+  const defaultMin = defaultDataRange[dataType].min;
+  const defaultMax = defaultDataRange[dataType].max;
+  if (min < defaultMin || max > defaultMax) {
+    throw new Error(
+        `The range of ${dataType} type should be [${defaultMin}, ${defaultMax}].`,
+    );
+  }
+}
 
-  const sign = dataRange.sign || 'mixed';
+/**
+ * Get a random floating point number in [0, 1] inclusive.
+ * @return {Number}
+ */
+function getFloatRandomInclusive() {
+  // The Math.random() method returns a random floating point number in [0, 1),
+  // below code would return a random floating point number in [0, 1].
+  return Math.min(1, Math.random() + Number.EPSILON);
+}
+
+/**
+ * Get a random integer between min and max (inclusive).
+ * @param {Number} min
+ * @param {Number} max
+ * @return {Number}
+ */
+function getIntRandomInclusive(min, max) {
+  return Math.floor(Math.random() * (max - min + 1)) + min;
+}
+
+/**
+ * Generate a random value based on dataType and optional constraints.
+ * @param {string} dataType - The data type (e.g., 'float32', 'int32').
+ * @param {Object} [resources={}] - Optional constraints for value generation.
+ * @param {{min: number, max: number}} [resources.dataRange] - Min and max bounds.
+ * @param {string} [resources.sign] - sign's value: 'mixed' (default), 'positive', or 'negative'.
+ * @return {number|bigint} A randomly generated number or BigInt based on constraints.
+ */
+function getRandom(dataType, resources={}) {
+  let min = defaultDataRange[dataType].min;
+  let max = defaultDataRange[dataType].max;
+  let data;
+
+  const sign = resources?.sign || 'mixed';
   if (sign === 'positive') {
-    if (max <= 0) {
-      throw new Error(`The max should be greater than 0 when sign is set as 'positive'.`);
-    }
-    if (min < 0) {
-      min = 0;
-    }
+    min = 0;
   } else if (sign === 'negative') {
-    if (min >= 0) {
-      throw new Error(`The min should be lesser than 0 when sign is set as 'negative'.`);
-    }
-    if (max > 0) {
-      max = 0;
-    }
-  } else {
-    // No change on min and max for mixed sign
+    max = 0;
   }
 
-  const factor = getFloatRandomInclusive();
-  let data;
+  if (resources?.dataRange) {
+    min = resources.dataRange.min;
+    max = resources.dataRange.max;
+    validateMinMax(min, max, dataType);
+  }
+
   if (dataType === 'float32' || dataType === 'float16') {
+    const factor = getFloatRandomInclusive();
     data = factor * (max - min) + min;
-  } else if (!['int64', 'uint64'].includes(dataType)) {
-    // integer
-    const minCeiled = Math.ceil(min);
-    const maxFloored = Math.floor(max);
-    data = Math.floor(factor * (maxFloored - minCeiled) + minCeiled);
   } else {
-    const convertedMin = Math.ceil(parseInt(min));
-    const convertedMax = Math.floor(parseInt(max));
-    data = BigInt(Math.floor(factor * (convertedMax - convertedMin) + convertedMin));
+    // integer
+    data = getIntRandomInclusive(min, max);
+
+    // TODO: support int64 and uint64
+    // if (['int64', 'uint64'].includes(dataType)) {
+    //   data = BigInt(data);
+    // }
   }
 
   return data;
 }
 
 /**
- * Get random numbers of TypedArray.
- * @param {Number} size
- * @param {{min: Number, max: Number, sign: String}} dataRange
+ * Convert raw data into a typed array of specified data type and size.
+ * Special handling is included for int64/uint64 (BigInt) and int4/uint4 (bit-packed).
  * @param {String} dataType
- * @return {(Array<Number>|Number)}
+ * @param {Number} size
+ * @param {Array|Number} data
+ * @return {TypedArray}
  */
-function getRandomNumbers(size, dataRange, dataType) {
-  const data = new Array(size);
-  for (let i = 0; i < size; i++) {
-    data[i] = getRandom(dataRange, dataType);
-  }
-  return getPrecisionData(data, dataType);
-}
-
-/**
- * Prepare input data by specified config of inputsDataInfo, dataFile, min,
- * max parameters.
- * @param {Object} inputsDataInfo information object for input data
- * @param {String} dataFile saved data file path
- * @param {{min: Number, max: Number}} dataRange
- * @return {Object}
- */
-function prepareInputsData(inputsDataInfo, dataFile, dataRange) {
-  const dstDataDict = {inputsData: {}};
-  let srcDataDict = {};
-  if (fs.existsSync(dataFile)) {
-    srcDataDict = readJsonFile(dataFile);
-  }
-  for (const source in inputsDataInfo) {
-    // reserve last input data when generating new required input data
-    if (srcDataDict['inputsData'] !== undefined &&
-        srcDataDict['inputsData'][source] !== undefined) {
-      dstDataDict['inputsData'][source] = srcDataDict['inputsData'][source];
-    } else {
-      const targetDataInfo = inputsDataInfo[source];
-      if (targetDataInfo.data !== undefined) {
-        const srcDataInfo = inputsDataInfo[targetDataInfo.data];
-        const inputTensor = new Tensor(
-            srcDataInfo.shape, dstDataDict['inputsData'][targetDataInfo.data]);
-        let outputTensor;
-        if (targetDataInfo.processCategory === 'transpose') {
-          outputTensor = transpose(
-              inputTensor, {permutation: targetDataInfo.permutation});
-        } else if (targetDataInfo.processCategory === 'negative') {
-          outputTensor = neg(inputTensor);
-        }
-        dstDataDict['inputsData'][source] = outputTensor.data;
-      } else {
-        const total = sizeOfShape(targetDataInfo.shape);
-        if (targetDataInfo.dataRange !== undefined) {
-          // Specified data range
-          dataRange = targetDataInfo.dataRange;
-        }
-        const generatedNumbers = getRandomNumbers(total, dataRange, targetDataInfo.dataType);
-        dstDataDict['inputsData'][source] = generatedNumbers;
-      }
+function getTypedArrayData(dataType, size, data) {
+  let outData;
+  if (dataType === 'int64' || dataType === 'uint64') {
+    if (typeof data === 'number' && size > 1) {
+      return new TypedArrayDict[dataType](size).fill(BigInt(data));
     }
+    outData = new TypedArrayDict[dataType](data.length);
+    for (let i = 0; i < data.length; i++) {
+      // TODO: support int64 and uint64
+      // outData[i] = BigInt(data[i]);
+      outData[i] = data[i];
+    }
+  } else if (dataType === 'uint4' || dataType === 'int4') {
+    // The first nybble is stored in the first bits 0-3, and later bits 4-7
+    // store the later nybble. The data is packed, without any padding between
+    // dimensions. For example: an array of uint4:
+    //   size = [2,5]
+    //   values = [1,2,3,4,5,6,7,8,9,10]
+    // Would yield 5 hex bytes:
+    //   Uint8Array.of(0x21, 0x43, 0x65, 0x87, 0xA9);
+    const array = new TypedArrayDict[dataType](Math.ceil(size / 2));
+    let i = 0;
+    while (i < size - 1) {
+      const packedByte = ((data[i + 1] & 0xf) << 4) | (data[i] & 0xf);
+      array[Math.floor(i / 2)] = packedByte;
+      i = i + 2;
+    }
+    // Handle the odd size.
+    if (i === size - 1) {
+      const packedByte = data[i] & 0xf;
+      array[Math.floor(i / 2)] = packedByte;
+    }
+    return array;
+  } else {
+    if (typeof data === 'number' && size > 1) {
+      return new TypedArrayDict[dataType](size).fill(data);
+    }
+    outData = new TypedArrayDict[dataType](data);
   }
-  return dstDataDict;
+  return outData;
 }
 
 /**
- * Get JSON object from specified JSON file.
+ * Create a folder if it does not exist.
+ * @param {String} folderName
+ */
+function mkdirIfNotExists(folderName) {
+  if (!fs.existsSync(folderName)) {
+    fs.mkdirSync(folderName);
+  }
+}
+
+/**
+ * Read a JSON file and return the parsed object.
+ * Supports relative or absolute file paths. Strips comments from JSON.
  * @param {String} filePath
  * @return {Object}
  */
@@ -235,18 +289,20 @@ function readJsonFile(filePath) {
   if (path.isAbsolute(filePath)) {
     inputFile = filePath;
   } else {
-    inputFile =
-        path.join(path.dirname(process.argv[1]), filePath);
+    inputFile = path.join(currentFolder, filePath);
   }
   const content = fs.readFileSync(inputFile).toString();
   const jsonDict = JSON.parse(
-      content.replace(/\\"|"(?:\\"|[^"])*"|(\/\/.*|\/\*[\s\S]*?\*\/)/g, // remove comments
-          (m, g) => g ? '' : m));
+      content.replace(
+          /\\"|"(?:\\"|[^"])*"|(\/\/.*|\/\*[\s\S]*?\*\/)/g, // remove comments
+          (m, g) => (g ? '' : m),
+      ),
+  );
   return jsonDict;
 }
 
 /**
- * Save JSON infomation into file.
+ * Save a JavaScript object as a JSON file, converting TypedArrays into plain arrays.
  * @param {Object} jsonDict
  * @param {String} saveFile
  */
@@ -255,35 +311,130 @@ function writeJsonFile(jsonDict, saveFile) {
   if (!fs.existsSync(parentDirectory)) {
     fs.mkdirSync(parentDirectory);
   }
-  const jsonString = JSON.stringify(jsonDict, function(key, value) {
-    // the replacer function is looking for some typed arrays.
-    // If found, it replaces it by a trio
-    if ( value instanceof Int8Array ||
-         value instanceof Uint8Array ||
-         value instanceof Int32Array ||
-         value instanceof Uint32Array ||
-         value instanceof BigInt64Array ||
-         value instanceof BigUint64Array ||
-         value instanceof Float16Array ||
-         value instanceof Float32Array) {
-      if (value.length === 1) {
-        const result = [];
-        result[0] = value[0];
-        return result;
-      } else {
-        return Array.apply([], value);
-      }
-    }
-    return value;
-  }, 2);
+  const jsonString = JSON.stringify(
+      jsonDict,
+      function(key, value) {
+        // the replacer function is looking for some typed arrays.
+        // If found, it replaces it by a trio
+        if (
+          value instanceof Int8Array ||
+          value instanceof Uint8Array ||
+          value instanceof Int32Array ||
+          value instanceof Uint32Array ||
+          value instanceof BigInt64Array ||
+          value instanceof BigUint64Array ||
+          value instanceof Float16Array ||
+          value instanceof Float32Array
+        ) {
+          if (value.length === 1) {
+            const result = [];
+            result[0] = value[0];
+            return result;
+          } else {
+            return Array.apply([], value);
+          }
+        }
+        return value;
+      },
+      2,
+  );
   fs.writeFileSync(saveFile, jsonString);
 }
 
+/**
+ * Generate tensor data for testing.
+ * Supports:
+ * - Fresh random generation.
+ * - Transformation (transpose/negate) of existing data.
+ * - Constraints via data range and sign.
+ * @param {Object} resources - Contains `descriptor` and `data` definition.
+ * @param {Object} data - Shared data pool to populate.
+ */
+function generateData(resources, data) {
+  // 1. the value of data is a string name like below
+  // {
+  //   "data": "float32InputData2D",
+  //   "descriptor": {"shape": [3, 3], "dataType": "float32"}
+  // },
+
+  // 2. the value of data is a object like below
+  // {
+  //   "data": {
+  //     "name": "float32InputData2DT",
+  //     "sourceData": {
+  //       "name": "float32InputData2D",
+  //       "process": "transpose", // transpose, negative
+  //       "permutation": [1, 0] // permutation option only for transpose
+  //     },
+  //     "specified": { // optional
+  //       "dataRange": {
+  //          "max": 10,
+  //          "min": -10
+  //       },
+  //       "sign": 'mixed' // // mixed (default), positive, negative
+  //     }
+  //   },
+  //   "descriptor": {"shape": [3, 3], "dataType": "float32"}
+  // },
+  const targetDataShape = resources.descriptor.shape;
+  const targetDataType = resources.descriptor.dataType;
+  let inputDataName;
+  let targetData;
+
+  if (typeof resources.data === 'string') {
+    inputDataName = resources.data;
+    if (!Object.getOwnPropertyDescriptor(data, inputDataName)) {
+      const size = sizeOfShape(targetDataShape);
+      targetData = new Array(size);
+      for (let i = 0; i < size; i++) {
+        targetData[i] = getRandom(targetDataType);
+      }
+      data[inputDataName] = getPrecisionData(targetData, targetDataType);
+    }
+  } else if (typeof resources.data === 'object' && resources.data.name) {
+    // process source data for target data
+    inputDataName = resources.data.name;
+    if (!Object.getOwnPropertyDescriptor(data, inputDataName)) {
+      if (resources.data.sourceData) {
+        const sourceDataResources = resources.data.sourceData;
+        const sourceData = data[sourceDataResources.name];
+        let outTensor;
+        if (sourceDataResources.process === 'transpose') {
+          const permutation = sourceDataResources.permutation;
+          const sourceDataShape = new Array(targetDataShape.length);
+          for (let i = 0; i < targetDataShape.length; ++i) {
+            sourceDataShape[permutation[i]] = targetDataShape[i];
+          }
+          const inputTensor = new Tensor(sourceDataShape, sourceData);
+          outTensor = transpose(inputTensor, {permutation});
+        } else if (sourceDataResources.process === 'negative') {
+          const sourceDataShape = targetDataShape;
+          const inputTensor = new Tensor(sourceDataShape, sourceData);
+          outTensor = neg(inputTensor);
+        }
+        targetData = outTensor.data;
+      } else {
+        let specifiedResources = {};
+        if (Object.getOwnPropertyDescriptor(resources.data, 'specified')) {
+          specifiedResources = resources.data.specified;
+        }
+        const size = sizeOfShape(targetDataShape);
+        targetData = new Array(size);
+        for (let i = 0; i < size; i++) {
+          targetData[i] = getRandom(targetDataType, specifiedResources);
+        }
+      }
+      data[inputDataName] = getPrecisionData(targetData, targetDataType);
+    }
+  }
+}
+
 export const utils = {
-  getPrecisionData: getPrecisionData,
-  getPrecisionDataFromDataDict: getPrecisionDataFromDataDict,
-  getRandomNumbers: getRandomNumbers,
-  prepareInputsData: prepareInputsData,
-  readJsonFile: readJsonFile,
-  writeJsonFile: writeJsonFile,
+  currentFolder, // Directory of the running script.
+  generateData, // Main function to generate/transform tensor data.
+  getPrecisionData, // Convert number(s) to specified typed array.
+  getTypedArrayData, // Generate typed array from JS array.
+  mkdirIfNotExists, // Create directory if missing.
+  readJsonFile, // Load JSON (with comment stripping).
+  writeJsonFile, // Save JSON (with TypedArray handling).
 };
